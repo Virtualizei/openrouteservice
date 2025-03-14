@@ -86,7 +86,50 @@ ENV BUILD_GRAPHS="True"
 ENV REBUILD_GRAPHS="False"
 
 # Create custom config for Brazil
-COPY --chown=ors:ors ./ors-config-brazil.yml ${ORS_HOME}/ors-config.yml
+# Create config file for Brazil
+RUN echo '
+ors:
+  info:
+    base_url: https://openrouteservice.org/
+    support_mail: support@openrouteservice.org
+    author_tag: openrouteservice
+    content_licence: LGPL 3.0
+  api:
+    enabled: true
+  services:
+    matrix:
+      enabled: true
+      maximum_search_radius: 5000
+    isochrones:
+      enabled: true
+      maximum_range_distance: 50000
+      maximum_range_time: 18000
+    routing:
+      enabled: true
+  engine:
+    source_file: ${ORS_HOME}/files/brazil-latest.osm.pbf
+    profiles: driving-car,driving-hgv,cycling-regular,foot-walking,wheelchair
+    init_threads: 2
+    elevation:
+      preprocessed: false
+      data_access: srtm
+      cache_path: ${ORS_HOME}/elevation_cache
+    profile_default:
+      name: driving-car
+      profiles: driving-car,driving-hgv,cycling-regular,foot-walking,wheelchair
+      directory: ${ORS_HOME}/graphs
+      build:
+        source_file: ${ORS_HOME}/files/brazil-latest.osm.pbf
+        elevation_preprocessed: false
+        graph_prepare_ch:
+          enabled: true
+          threads: 1
+        graph_prepare_lm:
+          enabled: true
+          threads: 1
+          landmarks: 16
+' > ${ORS_HOME}/ors-config.yml
+
 USER ors
 
 # Healthcheck
