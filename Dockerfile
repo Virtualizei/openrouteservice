@@ -73,6 +73,22 @@ ENV ORS_HOME=${ORS_HOME}
 
 WORKDIR ${ORS_HOME}
 
+# Download Brazil map
+USER root
+RUN apk add --no-cache wget
+RUN mkdir -p ${ORS_HOME}/files
+RUN wget https://download.geofabrik.de/south-america/brazil-latest.osm.pbf -O ${ORS_HOME}/files/brazil-latest.osm.pbf
+RUN chown -R ors:ors ${ORS_HOME}/files
+
+# Set environment variables for Brazil map
+ENV OSM_FILE="${ORS_HOME}/files/brazil-latest.osm.pbf"
+ENV BUILD_GRAPHS="True"
+ENV REBUILD_GRAPHS="False"
+
+# Create custom config for Brazil
+COPY --chown=ors:ors ./ors-config-brazil.yml ${ORS_HOME}/ors-config.yml
+USER ors
+
 # Healthcheck
 HEALTHCHECK --interval=3s --timeout=2s CMD ["sh", "-c", "wget --quiet --tries=1 --spider http://localhost:8082/ors/v2/health || exit 1"]
 
