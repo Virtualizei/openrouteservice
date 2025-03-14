@@ -1,0 +1,51 @@
+ors:
+  info:
+    base_url: https://openrouteservice.org/
+    support_mail: support@openrouteservice.org
+    author_tag: openrouteservice
+    content_licence: LGPL 3.0
+  api:
+    enabled: true
+    admin_key: ''
+    logging:
+      enabled: true
+  services:
+    matrix:
+      enabled: true
+      maximum_search_radius: 5000
+      maximum_routes: 100
+    isochrones:
+      enabled: true
+      maximum_range_distance: 50000
+      maximum_range_time: 18000
+      fastisochrones:
+        active: true
+        threads: 4
+        maximum_range_distance: 50000
+        maximum_range_time: 18000
+    routing:
+      enabled: true
+  engine:
+    source_file: ${ORS_HOME}/files/brazil-latest.osm.pbf
+    init_threads: 2
+    elevation:
+      preprocessed: false
+      data_access: srtm
+      cache_path: ${ORS_HOME}/elevation_cache
+    profile_default:
+      name: driving-car
+      profiles: driving-car,driving-hgv,cycling-regular,cycling-road,cycling-mountain,cycling-electric,foot-walking,foot-hiking,wheelchair
+      directory: ${ORS_HOME}/graphs
+      build:
+        source_file: ${ORS_HOME}/files/brazil-latest.osm.pbf
+        elevation_preprocessed: false
+        graph_build_mode: prepare_all
+        graph_prepare_ch:
+          enabled: true
+          threads: 1
+          weightings: recommended
+        graph_prepare_lm:
+          enabled: true
+          threads: 1
+          weightings: recommended,shortest
+          landmarks: 32
